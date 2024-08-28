@@ -46,7 +46,7 @@
             }
         },
         "set_absolute_max_current": {
-            "name": "Setze absolut maximalen ladestrom",
+            "name": "Setze absolut maximalen Ladestrom",
             "description": "Setzt den Wert des absoluten maximalen Ladestroms des Laders in Ampere",
             "fields": {
                 "charger_name": {
