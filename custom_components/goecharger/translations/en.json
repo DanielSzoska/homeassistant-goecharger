@@ -17,9 +17,23 @@
         }
     },
     "services": {
+        "set_temporary_max_current": {
+            "name": "Set temporary max current",
+            "description": "Sets the temporary maximum current in Ampere of the Charger (amx).",
+            "fields": {
+                "charger_name": {
+                    "name": "Charger name",
+                    "description": "name of the charger to update (if not specified all chargers will be changed)"
+                },
+                "max_current": {
+                    "name": "Maximum current",
+                    "description": "current to be set (6-32)"
+                }
+            }
+        },
         "set_max_current": {
             "name": "Set max current",
-            "description": "Sets the maximum current in Ampere of the Charger.",
+            "description": "Sets the maximum current in Ampere of the Charger (amp).",
             "fields": {
                 "charger_name": {
                     "name": "Charger name",

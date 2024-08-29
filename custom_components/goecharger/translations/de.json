@@ -17,9 +17,23 @@
         }
     },
     "services": {
+        "set_temporary_max_current": {
+            "name": "Setze temporären maximalen Strom",
+            "description": "Setzt den temporären maximalen Ladestrom in Ampere (amx)",
+            "fields": {
+                "charger_name": {
+                    "name": "Ladername",
+                    "description": "Name des zu ändernden Chargers (Wenn kein name angegeben wird werden alle geändert)"
+                },
+                "max_current": {
+                    "name": "Maximaler Strom",
+                    "description": "maximaler Strom in Ampere (6-32)"
+                }
+            }
+        },
         "set_max_current": {
             "name": "Setze maximalen Strom",
-            "description": "Setzt den maximalen Ladestrom in Ampere",
+            "description": "Setzt den maximalen Ladestrom in Ampere (amp)",
             "fields": {
                 "charger_name": {
                     "name": "Ladername",
