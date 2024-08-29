@@ -1,6 +1,5 @@
 {
     "config": {
-        "title": "go-eCharger hinzufügen",
         "step": {
             "user": {
                 "title": "go-eCharger Setup",
