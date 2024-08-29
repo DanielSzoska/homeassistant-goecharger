@@ -1,80 +1,82 @@
 """Platform for go-eCharger sensor integration."""
 import logging
 from homeassistant.const import (
-    TEMP_CELSIUS,
-    ENERGY_KILO_WATT_HOUR
+    PERCENTAGE,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfEnergy,
+    UnitOfPower,
+    UnitOfTemperature,
 )
 
 from homeassistant import core, config_entries
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.components.sensor import (
-    STATE_CLASS_TOTAL_INCREASING,
-    DEVICE_CLASS_ENERGY,
-    SensorEntity
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass
 )
 
 
 from .const import CONF_CHARGERS, DOMAIN, CONF_NAME, CONF_CORRECTION_FACTOR
 
-AMPERE = 'A'
-VOLT = 'V'
-POWER_KILO_WATT = 'kW'
 CARD_ID = 'Card ID'
-PERCENT = '%'
 
 _LOGGER = logging.getLogger(__name__)
 
 _sensorUnits = {
-    'charger_temp': {'unit': TEMP_CELSIUS, 'name': 'Charger Temp'},
-    'charger_temp0': {'unit': TEMP_CELSIUS, 'name': 'Charger Temp 0'},
-    'charger_temp1': {'unit': TEMP_CELSIUS, 'name': 'Charger Temp 1'},
-    'charger_temp2': {'unit': TEMP_CELSIUS, 'name': 'Charger Temp 2'},
-    'charger_temp3': {'unit': TEMP_CELSIUS, 'name': 'Charger Temp 3'},
-    'p_l1': {'unit': POWER_KILO_WATT, 'name': 'Power L1'},
-    'p_l2': {'unit': POWER_KILO_WATT, 'name': 'Power L2'},
-    'p_l3': {'unit': POWER_KILO_WATT, 'name': 'Power L3'},
-    'p_n': {'unit': POWER_KILO_WATT, 'name': 'Power N'},
-    'p_all': {'unit': POWER_KILO_WATT, 'name': 'Power All'},
-    'current_session_charged_energy': {'unit': ENERGY_KILO_WATT_HOUR, 'name': 'Current Session charged'},
-    'current_session_charged_energy_corrected': {'unit': ENERGY_KILO_WATT_HOUR, 'name': 'Current Session charged corrected'},
-    'energy_total': {'unit': ENERGY_KILO_WATT_HOUR, 'name': 'Total Charged'},
-    'energy_total_corrected': {'unit': ENERGY_KILO_WATT_HOUR, 'name': 'Total Charged corrected'},
-    'charge_limit': {'unit': ENERGY_KILO_WATT_HOUR, 'name': 'Charge limit'},
-    'u_l1': {'unit': VOLT, 'name': 'Voltage L1'},
-    'u_l2': {'unit': VOLT, 'name': 'Voltage L2'},
-    'u_l3': {'unit': VOLT, 'name': 'Voltage L3'},
-    'u_n': {'unit': VOLT, 'name': 'Voltage N'},
-    'i_l1': {'unit': AMPERE, 'name': 'Current L1'},
-    'i_l2': {'unit': AMPERE, 'name': 'Current L2'},
-    'i_l3': {'unit': AMPERE, 'name': 'Current L3'},
-    'charger_max_current': {'unit': AMPERE, 'name': 'Charger max current setting'},
-    'charger_absolute_max_current': {'unit': AMPERE, 'name': 'Charger absolute max current setting'},
-    'cable_lock_mode': {'unit': '', 'name': 'Cable lock mode'},
-    'cable_max_current': {'unit': AMPERE, 'name': 'Cable max current'},
+    'charger_temp': {'unit': UnitOfTemperature.CELSIUS, 'name': 'Charger Temp'},
+    'charger_temp0': {'unit': UnitOfTemperature.CELSIUS, 'name': 'Charger Temp 0'},
+    'charger_temp1': {'unit': UnitOfTemperature.CELSIUS, 'name': 'Charger Temp 1'},
+    'charger_temp2': {'unit': UnitOfTemperature.CELSIUS, 'name': 'Charger Temp 2'},
+    'charger_temp3': {'unit': UnitOfTemperature.CELSIUS, 'name': 'Charger Temp 3'},
+    'p_l1': {'unit': UnitOfPower.KILO_WATT, 'name': 'Power L1'},
+    'p_l2': {'unit': UnitOfPower.KILO_WATT, 'name': 'Power L2'},
+    'p_l3': {'unit': UnitOfPower.KILO_WATT, 'name': 'Power L3'},
+    'p_n': {'unit': UnitOfPower.KILO_WATT, 'name': 'Power N'},
+    'p_all': {'unit': UnitOfPower.KILO_WATT, 'name': 'Power All'},
+    'current_session_charged_energy': {'unit': UnitOfEnergy.KILO_WATT_HOUR, 'name': 'Current Session charged'},
+    'current_session_charged_energy_corrected': {'unit': UnitOfEnergy.KILO_WATT_HOUR, 'name': 'Current Session charged corrected'},
+    'energy_total': {'unit': UnitOfEnergy.KILO_WATT_HOUR, 'name': 'Total Charged'},
+    'energy_total_corrected': {'unit': UnitOfEnergy.KILO_WATT_HOUR, 'name': 'Total Charged corrected'},
+    'charge_limit': {'unit': UnitOfEnergy.KILO_WATT_HOUR, 'name': 'Charge limit'},
+    'u_l1': {'unit': UnitOfElectricPotential.VOLT, 'name': 'Voltage L1'},
+    'u_l2': {'unit': UnitOfElectricPotential.VOLT, 'name': 'Voltage L2'},
+    'u_l3': {'unit': UnitOfElectricPotential.VOLT, 'name': 'Voltage L3'},
+    'u_n': {'unit': UnitOfElectricPotential.VOLT, 'name': 'Voltage N'},
+    'i_l1': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Current L1'},
+    'i_l2': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Current L2'},
+    'i_l3': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Current L3'},
+    'charger_temporary_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Charger temporary current setting'},
+    'charger_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Charger max current setting'},
+    'charger_absolute_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Charger absolute max current setting'},
+    'cable_lock_mode': {'unit': None, 'name': 'Cable lock mode'},
+    'cable_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Cable max current'},
     'unlocked_by_card': {'unit': CARD_ID, 'name': 'Card used'},
-    'lf_l1': {'unit': PERCENT, 'name': 'Power factor L1'},
-    'lf_l2': {'unit': PERCENT, 'name': 'Power factor L2'},
-    'lf_l3': {'unit': PERCENT, 'name': 'Power factor L3'},
-    'lf_n': {'unit': PERCENT, 'name': 'Loadfactor N'},
-    'car_status': {'unit': '', 'name': 'Status'}
+    'lf_l1': {'unit': PERCENTAGE, 'name': 'Power factor L1'},
+    'lf_l2': {'unit': PERCENTAGE, 'name': 'Power factor L2'},
+    'lf_l3': {'unit': PERCENTAGE, 'name': 'Power factor L3'},
+    'lf_n': {'unit': PERCENTAGE, 'name': 'Loadfactor N'},
+    'car_status': {'unit': None, 'name': 'Status'}
 }
 
 _sensorStateClass = {
-    'energy_total': STATE_CLASS_TOTAL_INCREASING,
-    'energy_total_corrected': STATE_CLASS_TOTAL_INCREASING,
-    'current_session_charged_energy': STATE_CLASS_TOTAL_INCREASING,
-    'current_session_charged_energy_corrected': STATE_CLASS_TOTAL_INCREASING
+    'energy_total': SensorStateClass.TOTAL_INCREASING,
+    'energy_total_corrected': SensorStateClass.TOTAL_INCREASING,
+    'current_session_charged_energy': SensorStateClass.TOTAL_INCREASING,
+    'current_session_charged_energy_corrected': SensorStateClass.TOTAL_INCREASING
 }
 
 _sensorDeviceClass = {
-    'energy_total': DEVICE_CLASS_ENERGY,
-    'energy_total_corrected': DEVICE_CLASS_ENERGY,
-    'current_session_charged_energy': DEVICE_CLASS_ENERGY,
-    'current_session_charged_energy_corrected': DEVICE_CLASS_ENERGY
+    'energy_total': SensorDeviceClass.ENERGY,
+    'energy_total_corrected': SensorDeviceClass.ENERGY,
+    'current_session_charged_energy': SensorDeviceClass.ENERGY,
+    'current_session_charged_energy_corrected': SensorDeviceClass.ENERGY
 }
 
 _sensors = [
     'car_status',
+    'charger_temporary_max_current',
     'charger_max_current',
     'charger_absolute_max_current',
     'charger_err',
@@ -134,10 +136,10 @@ def _create_sensors_for_charger(chargerName, hass, correctionFactor):
     for sensor in _sensors:
 
         _LOGGER.debug(f"adding Sensor: {sensor} for charger {chargerName}")
-        sensorUnit = _sensorUnits.get(sensor).get('unit') if _sensorUnits.get(sensor) else ''
+        sensorUnit = _sensorUnits.get(sensor).get('unit') if _sensorUnits.get(sensor) else None
         sensorName = _sensorUnits.get(sensor).get('name') if _sensorUnits.get(sensor) else sensor
-        sensorStateClass = _sensorStateClass[sensor] if sensor in _sensorStateClass else ''
-        sensorDeviceClass = _sensorDeviceClass[sensor] if sensor in _sensorDeviceClass else ''
+        sensorStateClass = _sensorStateClass[sensor] if sensor in _sensorStateClass else None
+        sensorDeviceClass = _sensorDeviceClass[sensor] if sensor in _sensorDeviceClass else None
         entities.append(
             GoeChargerSensor(
                 hass.data[DOMAIN]["coordinator"],
@@ -189,7 +191,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             try:
                 correctionFactor = charger[0][CONF_CORRECTION_FACTOR]
             except:
-                __LOGGER.warn(f"can't parse correctionFactor. Using 1.0")
+                _LOGGER.warn(f"can't parse correctionFactor. Using 1.0")
                 correctionFactor = 1.0
 
         entities.extend(_create_sensors_for_charger(chargerName, hass, correctionFactor))
