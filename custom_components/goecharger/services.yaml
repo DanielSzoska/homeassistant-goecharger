@@ -4,6 +4,12 @@ set_max_current:
       example: "charger1"
     max_current:
       example: "16"
+set_temporary_max_current:
+  fields:
+    charger_name:
+      example: "charger1"
+    max_current:
+      example: "16"
 set_cable_lock_mode:
   fields:
     charger_name:

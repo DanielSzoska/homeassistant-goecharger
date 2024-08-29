@@ -154,8 +154,8 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
 
     await coordinator.async_refresh()
 
-    async def async_handle_set_max_current(call):
-        """Handle the service call to set the absolute max current."""
+    async def async_handle_set_temporary_max_current(call):
+        """Handle the service call to set the temporary max current (amx)."""
         chargerNameInput = call.data.get(CHARGER_NAME_ATTR, '')
 
         maxCurrentInput = call.data.get(
@@ -181,7 +181,7 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
             maxCurrent = 32
 
         if len(chargerNameInput) > 0:
-            _LOGGER.debug(f"set max_current for charger '{chargerNameInput}' to {maxCurrent}")
+            _LOGGER.debug(f"set temporary max_current (amx) for charger '{chargerNameInput}' to {maxCurrent}")
             try:
                 await hass.async_add_executor_job(hass.data[DOMAIN]["api"][chargerNameInput].setTmpMaxCurrent, maxCurrent)
             except KeyError:
@@ -190,8 +190,51 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
         else:
             for charger in hass.data[DOMAIN]["api"].keys():
                 try:
-                    _LOGGER.debug(f"set max_current for charger '{charger}' to {maxCurrent}")
+                    _LOGGER.debug(f"set temporary max_current (amx) for charger '{charger}' to {maxCurrent}")
                     await hass.async_add_executor_job(hass.data[DOMAIN]["api"][charger].setTmpMaxCurrent, maxCurrent)
+                except KeyError:
+                    _LOGGER.error(f"Charger with name '{chargerName}' not found!")
+
+        await hass.data[DOMAIN]["coordinator"].async_refresh()
+
+    async def async_handle_set_max_current(call):
+        """Handle the service call to set the max current (amp)."""
+        chargerNameInput = call.data.get(CHARGER_NAME_ATTR, '')
+
+        maxCurrentInput = call.data.get(
+            SET_MAX_CURRENT_ATTR, 32  # TODO: dynamic based on chargers absolute_max-setting
+        )
+        maxCurrent = 0
+        if isinstance(maxCurrentInput, str):
+            if maxCurrentInput.isnumeric():
+                maxCurrent = int(maxCurrentInput)
+            elif valid_entity_id(maxCurrentInput):
+                maxCurrent = int(hass.states.get(maxCurrentInput).state)
+            else:
+                _LOGGER.error(
+                    "No valid value for '%s': %s", SET_MAX_CURRENT_ATTR, maxCurrent
+                )
+                return
+        else:
+            maxCurrent = maxCurrentInput
+
+        if maxCurrent < 6:
+            maxCurrent = 6
+        if maxCurrent > 32:
+            maxCurrent = 32
+
+        if len(chargerNameInput) > 0:
+            _LOGGER.debug(f"set max_current (amp) for charger '{chargerNameInput}' to {maxCurrent}")
+            try:
+                await hass.async_add_executor_job(hass.data[DOMAIN]["api"][chargerNameInput].setMaxCurrent, maxCurrent)
+            except KeyError:
+                _LOGGER.error(f"Charger with name '{chargerName}' not found!")
+
+        else:
+            for charger in hass.data[DOMAIN]["api"].keys():
+                try:
+                    _LOGGER.debug(f"set max_current (amp) for charger '{charger}' to {maxCurrent}")
+                    await hass.async_add_executor_job(hass.data[DOMAIN]["api"][charger].setMaxCurrent, maxCurrent)
                 except KeyError:
                     _LOGGER.error(f"Charger with name '{chargerName}' not found!")
 
@@ -243,7 +286,7 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
         await hass.data[DOMAIN]["coordinator"].async_refresh()
 
     async def async_handle_set_cable_lock_mode(call):
-        """Handle the service call to set the absolute max current."""
+        """Handle the service call to set the cable lock mode."""
         chargerNameInput = call.data.get(CHARGER_NAME_ATTR, '')
         cableLockModeInput = call.data.get(SET_CABLE_LOCK_MODE_ATTR, 0)
         if isinstance(cableLockModeInput, str):
@@ -323,6 +366,7 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
 
         await hass.data[DOMAIN]["coordinator"].async_refresh()
 
+    hass.services.async_register(DOMAIN, "set_temporary_max_current", async_handle_set_temporary_max_current)
     hass.services.async_register(DOMAIN, "set_max_current", async_handle_set_max_current)
     hass.services.async_register(
         DOMAIN, "set_absolute_max_current", async_handle_set_absolute_max_current

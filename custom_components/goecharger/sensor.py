@@ -47,6 +47,7 @@ _sensorUnits = {
     'i_l1': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Current L1'},
     'i_l2': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Current L2'},
     'i_l3': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Current L3'},
+    'charger_temporary_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Charger temporary current setting'},
     'charger_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Charger max current setting'},
     'charger_absolute_max_current': {'unit': UnitOfElectricCurrent.AMPERE, 'name': 'Charger absolute max current setting'},
     'cable_lock_mode': {'unit': None, 'name': 'Cable lock mode'},
@@ -75,6 +76,7 @@ _sensorDeviceClass = {
 
 _sensors = [
     'car_status',
+    'charger_temporary_max_current',
     'charger_max_current',
     'charger_absolute_max_current',
     'charger_err',
@@ -189,7 +191,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             try:
                 correctionFactor = charger[0][CONF_CORRECTION_FACTOR]
             except:
-                __LOGGER.warn(f"can't parse correctionFactor. Using 1.0")
+                _LOGGER.warn(f"can't parse correctionFactor. Using 1.0")
                 correctionFactor = 1.0
 
         entities.extend(_create_sensors_for_charger(chargerName, hass, correctionFactor))
