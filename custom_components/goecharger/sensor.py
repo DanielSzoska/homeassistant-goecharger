@@ -166,7 +166,7 @@ async def async_setup_entry(
         try:
             correctionFactor = float(config[CONF_CORRECTION_FACTOR])
         except:
-            correctionFactor = 1.0 
+            correctionFactor = 1.0
 
     _LOGGER.debug(f"charger name: '{chargerName}'")
     _LOGGER.debug(f"config: '{config}'")
@@ -242,7 +242,7 @@ class GoeChargerSensor(CoordinatorEntity, SensorEntity):
         if (self._attribute == 'energy_total_corrected'):
             return self.coordinator.data[self._chargername]['energy_total'] * self.correctionFactor
         if (self._attribute == 'current_session_charged_energy_corrected'):
-            return self.coordinator.data[self._chargername]['current_session_charged_energy'] * self.correctionFactor   
+            return self.coordinator.data[self._chargername]['current_session_charged_energy'] * self.correctionFactor
         return self.coordinator.data[self._chargername][self._attribute]
 
     @property
