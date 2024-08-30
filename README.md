@@ -39,7 +39,7 @@ goecharger:
       host: <ip of your charger>
     - name: charger2
       host: <ip or hostname of charger 2>
-      correction_factor: factor for correction for total and session charged 
+      correction_factor: factor for correction for total and session charged
 ```
 
 # Sample View

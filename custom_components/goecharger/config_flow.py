@@ -73,7 +73,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(CONF_HOST, default=current_host): str,
                     vol.Optional(
-                        CONF_SCAN_INTERVAL, default=current_scan_interval if current_scan_interval else 20 
+                        CONF_SCAN_INTERVAL, default=current_scan_interval if current_scan_interval else 20
                     ): int,
                     vol.Required(
                         CONF_CORRECTION_FACTOR, default=current_correction_factor if current_correction_factor else "1.0"
