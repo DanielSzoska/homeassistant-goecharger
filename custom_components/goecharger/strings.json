@@ -16,7 +16,7 @@
         }
     },
     "options": {
-        "title": "Configure go-eCharger",
+        "flow_title": "Configure go-eCharger",
         "step": {
             "init": {
                 "title": "go-eCharger Configuration",
