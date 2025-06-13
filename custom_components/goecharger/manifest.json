@@ -2,13 +2,15 @@
   "domain": "goecharger",
   "name": "go-eCharger",
   "codeowners": [
-    "@cathiele"
+    "@cathiele",
+    "@mpw96",
+    "@DanielSzoska"
   ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/cathiele/homeassistant-goecharger",
+  "documentation": "https://github.com/DanielSzoska/homeassistant-goecharger",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/cathiele/homeassistant-goecharger/issues",
+  "issue_tracker": "https://github.com/DanielSzoska/homeassistant-goecharger/issues",
   "requirements": [
     "git+https://github.com/mpw96/goecharger.git@0.1.1"
   ],
